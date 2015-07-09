@@ -8,15 +8,20 @@ import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
 
 import static org.elasticsearch.rest.RestRequest.Method.GET;
+import static org.elasticsearch.rest.RestRequest.Method.POST;
 import org.elasticsearch.rest.action.search.RestSearchAction;
 
 public class SearchFormatRestHandler extends BaseRestHandler {
 
     @Inject
-    public SearchFormatRestHandler(Settings settings, RestController restController, Client client) {
-        super(settings, restController, client);
+    public SearchFormatRestHandler(Settings settings, RestController controller, Client client) {
+        super(settings, controller, client);
 
-        restController.registerHandler(GET, "/_search_format", this);
+        controller.registerHandler(GET, "/{index}/_search_format", this);
+        controller.registerHandler(POST, "/{index}/_search_format", this);
+        controller.registerHandler(GET, "/{index}/{type}/_search_format", this);
+        controller.registerHandler(POST, "/{index}/{type}/_search_format", this);
+        controller.registerHandler(GET, "/_search_format", this);
     }
 
     @Override
