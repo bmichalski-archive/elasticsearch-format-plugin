@@ -16,7 +16,6 @@ import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.rest.action.support.RestResponseListener;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
 
 public class FormatListener extends RestResponseListener<SearchResponse> {
 
