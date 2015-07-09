@@ -13,10 +13,17 @@
     <packaging>jar</packaging>
 
     <properties>
+        <opencsv.version>2.3</opencsv.version>
         <elasticsearch.version>1.6.0</elasticsearch.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${opencsv.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
