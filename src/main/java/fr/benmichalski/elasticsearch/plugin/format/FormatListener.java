@@ -50,7 +50,13 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
                 for (Map.Entry<String, Object> field : sourceAsMap.entrySet()) {
                     String key = field.getKey();
 
-                    stringList.add(XContentMapValues.extractValue(key, sourceAsMap).toString());
+                    Object extractValue = XContentMapValues.extractValue(key, sourceAsMap);
+
+                    if (null == extractValue) {
+                        stringList.add("");
+                    } else {
+                        stringList.add(extractValue.toString());
+                    }
                 }
 
                 String[] stringArr = new String[stringList.size()];
