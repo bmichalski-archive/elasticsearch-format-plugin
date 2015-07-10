@@ -40,12 +40,12 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
             logger.info("Total hits: " + (new Long(response.getHits().totalHits())).toString());
 
+            ArrayList<String> stringList = new ArrayList<String>();
+
             for (SearchHit hit : response.getHits().getHits()) {
                 ++i;
 
                 Map<String, Object> sourceAsMap = hit.sourceAsMap();
-
-                ArrayList<String> stringList = new ArrayList<String>(sourceAsMap.size());
 
                 for (Map.Entry<String, Object> field : sourceAsMap.entrySet()) {
                     String key = field.getKey();
@@ -54,6 +54,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
                     if (null == extractValue) {
                         stringList.add("");
+                    } else if (XContentMapValues.isArray(extractValue) || XContentMapValues.isObject(extractValue)) {
+                        stringList.add(""); //TODO
                     } else {
                         stringList.add(extractValue.toString());
                     }
@@ -61,6 +63,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
                 String[] stringArr = new String[stringList.size()];
                 stringArr = stringList.toArray(stringArr);
+
+                stringList.clear();
 
                 csvWriter.writeNext(stringArr);
 
