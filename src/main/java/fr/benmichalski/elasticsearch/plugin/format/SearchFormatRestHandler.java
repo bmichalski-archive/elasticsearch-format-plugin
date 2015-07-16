@@ -34,7 +34,7 @@ public class SearchFormatRestHandler extends BaseRestHandler {
             new FormatListener(
                 channel,
                 request.param("format", "csv"),
-                request.paramAsStringArray("keys", null)
+                request.paramAsStringArray("keys", new String[0])
             )
         );
     }
