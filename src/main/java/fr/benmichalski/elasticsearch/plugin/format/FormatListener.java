@@ -92,7 +92,7 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         final String scrollId = response.getScrollId();
 
         if (null != scrollId) {
-            bytesRestResponse.addHeader("X-SCROLL-ID", response.getScrollId());
+            bytesRestResponse.addHeader("scroll-id", response.getScrollId());
         }
 
         return bytesRestResponse;
