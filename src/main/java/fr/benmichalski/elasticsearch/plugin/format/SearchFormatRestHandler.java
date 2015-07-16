@@ -1,5 +1,6 @@
 package fr.benmichalski.elasticsearch.plugin.format;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.rest.*;
@@ -34,7 +35,11 @@ public class SearchFormatRestHandler extends BaseRestHandler {
             new FormatListener(
                 channel,
                 request.param("format", "csv"),
-                request.paramAsStringArray("keys", new String[0])
+                request.paramAsStringArray("keys", new String[0]),
+                request.param("separator", String.valueOf(CSVWriter.DEFAULT_SEPARATOR)).charAt(0),
+                request.param("quoteChar", String.valueOf(CSVWriter.DEFAULT_QUOTE_CHARACTER)).charAt(0),
+                request.param("escapeChar", String.valueOf(CSVWriter.DEFAULT_ESCAPE_CHARACTER)).charAt(0),
+                request.param("lineEnd", CSVWriter.DEFAULT_LINE_END)
             )
         );
     }

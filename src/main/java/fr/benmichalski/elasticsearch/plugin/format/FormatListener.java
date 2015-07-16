@@ -26,25 +26,48 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
     private final String[] keys;
 
+    private final char separator;
+
+    private final char quoteChar;
+
+    private final char escapeChar;
+
+    private final String lineEnd;
+
     public FormatListener(
-        RestChannel channel,
-        String format,
-        String[] keys
+        final RestChannel channel,
+        final String format,
+        final String[] keys,
+        final char separator,
+        final char quoteChar,
+        final char escapeChar,
+        final String lineEnd
     ) {
         super(channel);
 
         this.format = format;
         this.keys = keys;
+
+        this.separator = separator;
+        this.quoteChar = quoteChar;
+        this.escapeChar = escapeChar;
+        this.lineEnd = lineEnd;
     }
 
-    private RestResponse handleCsv(SearchResponse response) throws IOException {
+    private RestResponse handleCsv(final SearchResponse response) throws IOException {
         final XContentBuilder builder = this.channel.newBuilder();
 
         final OutputStream stream = builder.stream();
 
         final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(stream);
 
-        final CSVWriter csvWriter = new CSVWriter(outputStreamWriter);
+        final CSVWriter csvWriter = new CSVWriter(
+            outputStreamWriter,
+            this.separator,
+            this.quoteChar,
+            this.escapeChar,
+            this.lineEnd
+        );
 
         final ArrayList<String> stringList = new ArrayList<String>();
 
