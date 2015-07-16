@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.lang3.StringUtils;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -34,6 +36,10 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
     private final String lineEnd;
 
+    private final String multiValuedSeparator;
+
+    private final char multiValuedQuoteChar;
+
     public FormatListener(
         final RestChannel channel,
         final String format,
@@ -41,7 +47,9 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         final char separator,
         final char quoteChar,
         final char escapeChar,
-        final String lineEnd
+        final String lineEnd,
+        final String multiValuedSeparator,
+        final char multiValuedQuoteChar
     ) {
         super(channel);
 
@@ -52,6 +60,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         this.quoteChar = quoteChar;
         this.escapeChar = escapeChar;
         this.lineEnd = lineEnd;
+        this.multiValuedSeparator = multiValuedSeparator;
+        this.multiValuedQuoteChar = multiValuedQuoteChar;
     }
 
     private RestResponse handleCsv(final SearchResponse response) throws IOException {
@@ -73,7 +83,12 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
         Map<String, Object> sourceAsMap;
         String[] stringArr;
+        final ArrayList<String> converted = new ArrayList<String>();
+        boolean broken;
+        List extractValueList;
+
         int i = 0;
+        int j;
 
         for (SearchHit hit : response.getHits().getHits()) {
             ++i;
@@ -86,7 +101,36 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
                 if (null == extractValue) {
                     stringList.add("");
                 } else if (XContentMapValues.isArray(extractValue) || XContentMapValues.isObject(extractValue)) {
-                    stringList.add(""); //TODO
+                    //Converts simple multivalued field to string
+                    if (XContentMapValues.isArray(extractValue)) {
+                        extractValueList = (List)extractValue;
+
+                        converted.clear();
+
+                        broken = false;
+                        j = 0;
+
+                        for (Object value : extractValueList) {
+                            if (null == value) {
+                                converted.add(this.multiValuedQuoteChar + "" + this.multiValuedQuoteChar);
+                            } if (XContentMapValues.isArray(value) | XContentMapValues.isObject(value)) {
+                                //Breaking if field is not simple multivalued array
+                                broken = true;
+                                break;
+                            } else {
+                                converted.add(this.multiValuedQuoteChar + value.toString() + this.multiValuedQuoteChar);
+                            }
+                        }
+
+                        if (broken) {
+                            stringList.add("");
+                        } else {
+                            stringList.add(StringUtils.join(converted, this.multiValuedSeparator));
+                        }
+                    } else {
+                        //If content is an object, returns an empty string.
+                        stringList.add("");
+                    }
                 } else {
                     stringList.add(extractValue.toString());
                 }

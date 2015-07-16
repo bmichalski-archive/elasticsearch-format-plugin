@@ -39,7 +39,9 @@ public class SearchFormatRestHandler extends BaseRestHandler {
                 request.param("separator", String.valueOf(CSVWriter.DEFAULT_SEPARATOR)).charAt(0),
                 request.param("quoteChar", String.valueOf(CSVWriter.DEFAULT_QUOTE_CHARACTER)).charAt(0),
                 request.param("escapeChar", String.valueOf(CSVWriter.DEFAULT_ESCAPE_CHARACTER)).charAt(0),
-                request.param("lineEnd", CSVWriter.DEFAULT_LINE_END)
+                request.param("lineEnd", CSVWriter.DEFAULT_LINE_END),
+                request.param("multiValuedSeparator", " | "),
+                request.param("multiValuedQuoteChar", "\"").charAt(0)
             )
         );
     }
