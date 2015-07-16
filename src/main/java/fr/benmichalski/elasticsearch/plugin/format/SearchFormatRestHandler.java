@@ -29,6 +29,13 @@ public class SearchFormatRestHandler extends BaseRestHandler {
         SearchRequest searchRequest = RestSearchAction.parseSearchRequest(request);
         searchRequest.listenerThreaded(false);
 
-        client.search(searchRequest, new FormatListener(channel));
+        client.search(
+            searchRequest,
+            new FormatListener(
+                channel,
+                request.param("format", "csv"),
+                request.paramAsStringArray("keys", null)
+            )
+        );
     }
 }
