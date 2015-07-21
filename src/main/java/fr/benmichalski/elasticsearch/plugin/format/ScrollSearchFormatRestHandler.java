@@ -1,6 +1,7 @@
 package fr.benmichalski.elasticsearch.plugin.format;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import java.nio.charset.Charset;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
@@ -42,6 +43,10 @@ public class ScrollSearchFormatRestHandler extends BaseRestHandler {
             searchScrollRequest.scroll(new Scroll(parseTimeValue(scroll, null)));
         }
 
+        final Charset charset = Charset.forName(
+            request.param("charset", "UTF-8")
+        );
+
         client.searchScroll(
             searchScrollRequest,
             new FormatListener(
@@ -53,7 +58,8 @@ public class ScrollSearchFormatRestHandler extends BaseRestHandler {
                 request.param("escapeChar", String.valueOf(CSVWriter.DEFAULT_ESCAPE_CHARACTER)).charAt(0),
                 request.param("lineEnd", CSVWriter.DEFAULT_LINE_END),
                 request.param("multiValuedSeparator", " | "),
-                request.param("multiValuedQuoteChar", "\"").charAt(0)
+                request.param("multiValuedQuoteChar", "\"").charAt(0),
+                charset
             )
         );
     }
