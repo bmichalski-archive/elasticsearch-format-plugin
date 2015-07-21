@@ -7,6 +7,9 @@ The REST endpoints are suffixed _format, equivalent to the REST endpoint _search
 Currently supported output formats are:
 * csv
 
+###Compatibility
+This plugin has been tested and is supposed to work with Elasticsearch v1.6.
+
 ###Minimal curl example 
 
 	curl -XPUT localhost:9200/_search_format?format=csv&keys=foo,bar
