@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
     private final char multiValuedQuoteChar;
 
+    private final Charset charset;
+
     public FormatListener(
         final RestChannel channel,
         final String format,
@@ -49,7 +52,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         final char escapeChar,
         final String lineEnd,
         final String multiValuedSeparator,
-        final char multiValuedQuoteChar
+        final char multiValuedQuoteChar,
+        final Charset charset
     ) {
         super(channel);
 
@@ -62,6 +66,7 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         this.lineEnd = lineEnd;
         this.multiValuedSeparator = multiValuedSeparator;
         this.multiValuedQuoteChar = multiValuedQuoteChar;
+        this.charset = charset;
     }
 
     private RestResponse handleCsv(final SearchResponse response) throws IOException {
@@ -69,7 +74,10 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
         final OutputStream stream = builder.stream();
 
-        final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(stream);
+        final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+            stream,
+            this.charset
+        );
 
         final CSVWriter csvWriter = new CSVWriter(
             outputStreamWriter,

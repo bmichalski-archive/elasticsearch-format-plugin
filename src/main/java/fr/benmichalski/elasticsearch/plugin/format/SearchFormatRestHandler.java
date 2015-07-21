@@ -1,6 +1,7 @@
 package fr.benmichalski.elasticsearch.plugin.format;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import java.nio.charset.Charset;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.rest.*;
@@ -30,6 +31,10 @@ public class SearchFormatRestHandler extends BaseRestHandler {
         SearchRequest searchRequest = RestSearchAction.parseSearchRequest(request);
         searchRequest.listenerThreaded(false);
 
+        final Charset charset = Charset.forName(
+            request.param("charset", "UTF-8")
+        );
+
         client.search(
             searchRequest,
             new FormatListener(
@@ -41,7 +46,8 @@ public class SearchFormatRestHandler extends BaseRestHandler {
                 request.param("escapeChar", String.valueOf(CSVWriter.DEFAULT_ESCAPE_CHARACTER)).charAt(0),
                 request.param("lineEnd", CSVWriter.DEFAULT_LINE_END),
                 request.param("multiValuedSeparator", " | "),
-                request.param("multiValuedQuoteChar", "\"").charAt(0)
+                request.param("multiValuedQuoteChar", "\"").charAt(0),
+                charset
             )
         );
     }
