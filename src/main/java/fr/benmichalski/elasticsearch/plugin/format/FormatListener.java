@@ -2,8 +2,8 @@ package fr.benmichalski.elasticsearch.plugin.format;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.lang3.StringUtils;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.support.XContentMapValues;
 import org.elasticsearch.rest.BytesRestResponse;
 import org.elasticsearch.rest.RestChannel;
@@ -40,6 +39,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
     private final char multiValuedQuoteChar;
 
+    private final Charset charset;
+
     public FormatListener(
         final RestChannel channel,
         final String format,
@@ -49,7 +50,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         final char escapeChar,
         final String lineEnd,
         final String multiValuedSeparator,
-        final char multiValuedQuoteChar
+        final char multiValuedQuoteChar,
+        final Charset charset
     ) {
         super(channel);
 
@@ -62,17 +64,14 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         this.lineEnd = lineEnd;
         this.multiValuedSeparator = multiValuedSeparator;
         this.multiValuedQuoteChar = multiValuedQuoteChar;
+        this.charset = charset;
     }
 
     private RestResponse handleCsv(final SearchResponse response) throws IOException {
-        final XContentBuilder builder = this.channel.newBuilder();
-
-        final OutputStream stream = builder.stream();
-
-        final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(stream);
+        final StringWriter stringWriter = new StringWriter();
 
         final CSVWriter csvWriter = new CSVWriter(
-            outputStreamWriter,
+            stringWriter,
             this.separator,
             this.quoteChar,
             this.escapeChar,
@@ -88,7 +87,6 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         List extractValueList;
 
         int i = 0;
-        int j;
 
         for (SearchHit hit : response.getHits().getHits()) {
             ++i;
@@ -108,7 +106,6 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
                         converted.clear();
 
                         broken = false;
-                        j = 0;
 
                         for (Object value : extractValueList) {
                             if (null == value) {
@@ -153,7 +150,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
         final BytesRestResponse bytesRestResponse = new BytesRestResponse(
             response.status(),
-            builder
+            "text/plain; charset=" + this.charset.displayName(),
+            stringWriter.toString().getBytes(this.charset)
         );
 
         final String scrollId = response.getScrollId();
