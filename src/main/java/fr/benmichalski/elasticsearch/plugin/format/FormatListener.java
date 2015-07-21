@@ -2,16 +2,12 @@ package fr.benmichalski.elasticsearch.plugin.format;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.io.stream.BytesStreamOutput;
 import org.elasticsearch.common.lang3.StringUtils;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
