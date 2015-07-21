@@ -31,3 +31,6 @@ Currently supported output formats are:
   * default value is " | "
 * multiValuedQuoteChar, a single character
   * default value is "
+* charset, a string
+  * default value is "UTF-8"
+  * supported charset defined in http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html, in first column "Canonical Name for java.nio API"
