@@ -87,7 +87,6 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         List extractValueList;
 
         int i = 0;
-        int j;
 
         for (SearchHit hit : response.getHits().getHits()) {
             ++i;
@@ -107,7 +106,6 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
                         converted.clear();
 
                         broken = false;
-                        j = 0;
 
                         for (Object value : extractValueList) {
                             if (null == value) {
