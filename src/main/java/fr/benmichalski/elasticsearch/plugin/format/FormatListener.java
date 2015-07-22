@@ -150,7 +150,7 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
         final BytesRestResponse bytesRestResponse = new BytesRestResponse(
             response.status(),
-            "text/plain; charset=" + this.charset.displayName(),
+            "text/csv; charset=" + this.charset.displayName(),
             stringWriter.toString().getBytes(this.charset)
         );
 
