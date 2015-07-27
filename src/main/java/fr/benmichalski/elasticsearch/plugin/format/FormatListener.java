@@ -39,6 +39,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
     private final char multiValuedQuoteChar;
 
+    private final String combinedMultiValuedQuoteString;
+
     private final Charset charset;
 
     public FormatListener(
@@ -65,6 +67,8 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         this.multiValuedSeparator = multiValuedSeparator;
         this.multiValuedQuoteChar = multiValuedQuoteChar;
         this.charset = charset;
+
+        this.combinedMultiValuedQuoteString = this.multiValuedQuoteChar + this.multiValuedSeparator + this.multiValuedQuoteChar;
     }
 
     private RestResponse handleCsv(final SearchResponse response) throws IOException {
@@ -85,7 +89,7 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         final ArrayList<String> converted = new ArrayList<String>();
         boolean broken;
         List extractValueList;
-        int stringListSize;
+        int convertedListSize;
 
         int i = 0;
 
@@ -110,24 +114,34 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
                         for (Object value : extractValueList) {
                             if (null == value) {
-                                converted.add(this.multiValuedQuoteChar + "" + this.multiValuedQuoteChar);
-                            } if (XContentMapValues.isArray(value) | XContentMapValues.isObject(value)) {
+                                converted.add("");
+                            } else if (XContentMapValues.isArray(value) | XContentMapValues.isObject(value)) {
                                 //Breaking if field is not simple multivalued array
                                 broken = true;
                                 break;
                             } else {
-                                converted.add(this.multiValuedQuoteChar + value.toString() + this.multiValuedQuoteChar);
+                                converted.add(value.toString());
                             }
                         }
 
                         if (broken) {
                             stringList.add("");
-                        } else if ((stringListSize = stringList.size()) == 0) {
-                            stringList.add("");
-                        } else if (stringListSize == 1) {
-                            stringList.add(stringList.get(0));
-                        }  else {
-                            stringList.add(StringUtils.join(converted, this.multiValuedSeparator));
+                        } else {
+                            convertedListSize = converted.size();
+
+                            if (convertedListSize == 0) {
+                                stringList.add("");
+                            } else if (convertedListSize == 1) {
+                                stringList.add(converted.get(0));
+                            } else {
+                                stringList.add(
+                                    this.multiValuedQuoteChar
+                                    +  StringUtils.join(
+                                        converted,
+                                        this.combinedMultiValuedQuoteString
+                                    ) + this.multiValuedQuoteChar
+                                );
+                            }
                         }
                     } else {
                         //If content is an object, returns an empty string.
