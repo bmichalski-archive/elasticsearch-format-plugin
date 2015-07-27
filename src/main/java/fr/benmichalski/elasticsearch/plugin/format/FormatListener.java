@@ -85,6 +85,7 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
         final ArrayList<String> converted = new ArrayList<String>();
         boolean broken;
         List extractValueList;
+        int stringListSize;
 
         int i = 0;
 
@@ -121,7 +122,11 @@ public class FormatListener extends RestResponseListener<SearchResponse> {
 
                         if (broken) {
                             stringList.add("");
-                        } else {
+                        } else if ((stringListSize = stringList.size()) == 0) {
+                            stringList.add("");
+                        } else if (stringListSize == 1) {
+                            stringList.add(stringList.get(0));
+                        }  else {
                             stringList.add(StringUtils.join(converted, this.multiValuedSeparator));
                         }
                     } else {
